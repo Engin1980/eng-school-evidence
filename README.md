@@ -7,7 +7,7 @@ Jednoduchá webová aplikace (React + Vite) pro evidenci domácích úkolů. Bez
 1. V [Firebase konzoli](https://console.firebase.google.com) vytvořte projekt a přidejte Web app. Hodnoty konfigurace zkopírujte do `.env` (vzor v `.env.example`).
 2. **Authentication → Sign-in method**: zapněte *Email/Password* a v něm volbu *Email link (passwordless sign-in)*.
 3. **Authentication → Settings → Authorized domains**: přidejte doménu, na které aplikace poběží (`localhost` je tam ve výchozím stavu).
-4. **Firestore Database**: vytvořte databázi.
+4. **Firestore Database** (Cloud Firestore, ne Realtime Database ani SQL / Data Connect): vytvořte databázi v režimu *Native* (výchozí `(default)` databáze). Režim zabezpečení zvolte *production*; pravidla se nasadí z `firestore.rules`.
 5. **První uživatel** (ručně v konzoli): v kolekci `allowedUsers` vytvořte dokument s ID rovným vašemu e-mailu **malými písmeny** a poli `email` (string, stejná hodnota) a `name` (string). Další uživatele pak přidává přímo aplikace na stránce *Uživatelé*.
 6. Zkopírujte `.firebaserc.example` na `.firebaserc` a doplňte ID projektu.
 
