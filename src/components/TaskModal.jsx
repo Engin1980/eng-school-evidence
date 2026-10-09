@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
 import { useAuth } from '../lib/auth.jsx';
-import { STATUSES, formatTimestamp } from '../lib/tasks.js';
+import { STATUSES, formatTimestamp, todayString } from '../lib/tasks.js';
 import { deleteTaskDeep } from '../lib/students.js';
 import Comments from './Comments.jsx';
 
@@ -10,10 +10,9 @@ import Comments from './Comments.jsx';
 export default function TaskModal({ studentId, task, subjects, onClose }) {
   const { user } = useAuth();
   const [form, setForm] = useState({
-    title: task?.title ?? '',
     description: task?.description ?? '',
     subjectId: task?.subjectId ?? subjects[0]?.id ?? '',
-    dueDate: task?.dueDate ?? '',
+    dueDate: task?.dueDate ?? todayString(),
     status: task?.status ?? 'created',
   });
   const [busy, setBusy] = useState(false);
@@ -24,7 +23,7 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const data = { ...form, title: form.title.trim() };
+    const data = { ...form, description: form.description.trim() };
     try {
       if (task) await updateDoc(doc(db, 'students', studentId, 'tasks', task.id), data);
       else {
@@ -56,10 +55,6 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
         <h2>{task ? 'Úkol' : 'Nový úkol'}</h2>
         <form className="form-grid" onSubmit={submit}>
           <label>
-            Název
-            <input required value={form.title} onChange={set('title')} />
-          </label>
-          <label>
             Předmět
             <select required value={form.subjectId} onChange={set('subjectId')}>
               {subjectMissing && <option value={task.subjectId}>(smazaný předmět)</option>}
@@ -86,7 +81,7 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
           </label>
           <label>
             Popis
-            <textarea value={form.description} onChange={set('description')} />
+            <textarea required value={form.description} onChange={set('description')} />
           </label>
           {task && (
             <span className="muted">

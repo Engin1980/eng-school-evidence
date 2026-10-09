@@ -80,7 +80,7 @@ export default function Board({ studentId, subjects }) {
                 onDragStart={(e) => e.dataTransfer.setData('text/plain', t.id)}
               >
                 <div className="title" onClick={() => setModal({ task: t })}>
-                  {t.title}
+                  {t.description}
                 </div>
                 <div>
                   <span className="tag">{subjectName(t.subjectId)}</span>

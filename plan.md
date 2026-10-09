@@ -18,7 +18,7 @@ Stack: React + Vite, Firebase Auth (e-mailový odkaz), Firestore, Firebase Hosti
 4. **Uživatelé** (scénář 1): seznam povolených uživatelů a formulář pro přidání (e-mail + jméno). Commit.
 5. **Studenti** (scénáře 2, 3): seznam studentů uživatele, vytvoření, přejmenování, smazání (včetně podkolekcí), přidání existujícího uživatele ke studentovi. Commit.
 6. **Předměty** (scénář 7): správa předmětů ve studentovi (přidat, přejmenovat, smazat). Commit.
-7. **Úkoly a kanban** (scénáře 4, 5): formulář úkolu (předmět povinný, termín, popis; autor a datum automaticky), tři sloupce, přesun karet tažením i tlačítky, úprava a smazání. Čisté pomocné funkce s testy (vitest). Commit.
+7. **Úkoly a kanban** (scénáře 4, 5): formulář úkolu (předmět a neprázdný popis povinné, bez názvu, termín výchozí dnes; autor a datum automaticky), tři sloupce, přesun karet tažením i tlačítky, úprava a smazání. Čisté pomocné funkce s testy (vitest). Commit.
 8. **Komentáře** (scénář 6): detail úkolu s vlákny komentářů, přidání a smazání. Commit.
 9. **Nasazení a dokumentace**: `README.md` s postupem (vytvoření projektu, zapnutí e-mail link přihlášení, povolení domény, první uživatel, `firebase deploy`), aktualizace `CLAUDE.md` o příkazy. Ověření `npm run build` a `npm test`. Commit.
 

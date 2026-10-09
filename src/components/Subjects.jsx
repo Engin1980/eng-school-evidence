@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import { deleteTaskDeep } from '../lib/students.js';
 
 export default function Subjects({ studentId, subjects }) {
   const [name, setName] = useState('');
@@ -30,8 +31,14 @@ export default function Subjects({ studentId, subjects }) {
   };
 
   const remove = (s) => {
-    if (window.confirm(`Smazat předmět ${s.name}? Úkoly zůstanou, ale bez předmětu.`)) {
-      run(() => deleteDoc(doc(col, s.id)));
+    if (window.confirm(`Smazat předmět ${s.name} včetně všech jeho úkolů a komentářů?`)) {
+      run(async () => {
+        const tasks = await getDocs(
+          query(collection(db, 'students', studentId, 'tasks'), where('subjectId', '==', s.id)),
+        );
+        for (const t of tasks.docs) await deleteTaskDeep(studentId, t.id);
+        await deleteDoc(doc(col, s.id));
+      });
     }
   };
 

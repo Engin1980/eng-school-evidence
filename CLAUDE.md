@@ -18,9 +18,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Allowed user** (`allowedUsers/{lowercased email}`): the allow-list. An existing user adds a new user by email. The first user is created manually in the Firebase console. The document id is the lowercased email so the Firestore rules can look it up directly.
 - **Student** (`students/{id}`): `memberEmails` lists the users attached to the student. Users can only be added, not removed (removal is out of scope).
 - **Subject** (`students/{id}/subjects/{id}`): per student only.
-- **Task** (`students/{id}/tasks/{id}`): title, description, required `subjectId`, user-entered due date, status (`created` → `active` → `done`) and an automatic `createdBy` and `createdAt`. The status is changed on a kanban board by drag and drop.
+- **Task** (`students/{id}/tasks/{id}`): required description (no title), required `subjectId`, due date (defaults to today, user can change it), status (`created` → `active` → `done`) and an automatic `createdBy` and `createdAt`. The status is changed on a kanban board by drag and drop.
 - **Comment** (`students/{id}/tasks/{id}/comments/{id}`): text, author and time, shown in chronological order under the task.
-- Users can edit and delete students and subjects, and delete tasks and comments.
+- Users can edit and delete students and subjects, and delete tasks and comments. Deleting a subject deletes all its tasks (and their comments).
 
 ## Commands
 

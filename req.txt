@@ -38,8 +38,9 @@ Mazání a správa:
 - Odebrání uživatele od studenta nebylo vybráno (zatím mimo rozsah; scénář 3 jen přidání).
 
 Rozhodnutí při implementaci:
-- Úkol má povinný název (title), povinný předmět a povinný termín splnění.
-- Po smazání předmětu zůstanou jeho úkoly a zobrazují se jako "(smazaný předmět)".
+- Úkol nemá název: má jen předmět (ze seznamu předmětů studenta) a popis. Popis nesmí být prázdný.
+- Termín splnění je ve výchozím stavu dnešní den; uživatel ho může změnit.
+- Smazání předmětu smaže i všechny jeho úkoly (včetně komentářů).
 - Uživatele nelze z aplikace odebrat ze seznamu povolených (jen přidat).
 - Odebrání uživatele od studenta zatím není implementováno.
 - Implementace nebyla ověřena proti živému Firebase projektu (pravidla, přihlášení, dotazy).
