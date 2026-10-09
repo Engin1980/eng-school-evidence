@@ -1,0 +1,38 @@
+Potřebuji vytvořit jednoduchou webovou aplikaci na evidenci domácích úkolů ve škole. Potřebuji do aplikace zadat předvnit a potom nějaký popis k tomu domácímu úkolu. Ale vždycky tam bude datum, kdy se to vložilo, případně kdo to vložil. A bude tam datum splnění, které zadává uživatel. Všechny úkoly potřebují, aby měli nějaký stav něco jako klasický kanban. To znamená vytvořené aktivní a dokončené. Více uživatelů, takže potřebují nějakou jednoduchou autorizaci, ale nejedná se o nijak zvlášť kritická data. Takže vlastně stačí něco velmi triviálního. Kdyby náhodou šlo k tomu, že do toho někdo vleze omylem anebo na to zaútočí a ta smaže tak je mi to celkem jedno. 
+
+Architektonicky by mi se líbilo, kdyby to byla pouze frontendová aplikace, která ta data ukládá na nějaký web cloud úložiště něco jako firebase. Spolu s tím by bylo fajný, nějaký jednoduchý deployment. 
+
+Umožňovat nějakou velmi jednoduchou správu uživatelů ve stylu přidání nebo odebráni uživatele k danému žákovi. 
+
+Základní scénáře: 
+1. Existující uživatel může vytvořit nového uživatele. 
+2. Existující uživatel může vytvořit studenta. 
+3. Existující uživatel může připojit jiného existujícího uživatele ke studentovi. 
+4. Uživatel u studenta může vložit úkol včetně jeho atributů. 
+5. Uživatel může měnit stav úkolů a jeho atributy. Změnu stavu bych ideálně preferoval přes kanban. 
+6. Uživatel může k libovolnému úkolu připsat poznámku. Poznámky se zobrazují ve formě komentářů od jednotlivých uživatelů pod sebou. 
+7. Uživatel může vytvářet u studenta předměty. Předměty teda platí pro konkrétního studenta.
+
+---
+POZNÁMKY / ROZHODNUTÍ (doplněno při upřesňování)
+
+Přihlášení:
+- Firebase Authentication, přihlášení e-mailovým odkazem (passwordless), funguje s libovolným e-mailem, ne jen Google.
+- Přihlášení se drží v prohlížeči dlouhodobě (localStorage), dokud se uživatel neodhlásí nebo nesmaže data prohlížeče. Odkaz je potřeba jen při prvním přihlášení na daném zařízení.
+- Odkaz je nejlepší otevřít ve stejném prohlížeči, kde se o něj žádalo; jinak aplikace znovu zeptá na e-mail.
+- Zakládání uživatelů (scénář 1): existující uživatel zadá e-mail nového uživatele, uloží se do Firestore jako povolený; pravidla databáze pustí jen e-maily z tohoto seznamu. Nový uživatel si pak sám vyžádá odkaz.
+- První uživatel se založí ručně v konzoli Firebase.
+- K ověření: limit odesílaných e-mailů v bezplatném tarifu; e-maily z noreply@firebaseapp.com mohou končit ve spamu.
+
+Vazby mezi entitami:
+- Uživatel vytvoří studenta. Ke studentovi se přiřazují předměty (předmět patří jen jednomu studentovi).
+- Ke studentovi se dávají úkoly, které se přiřazují k předmětům (předmět je u úkolu povinný).
+- Při vytvoření úkolu se vždy automaticky zapíše, kdo a kdy ho vytvořil.
+
+Technologie:
+- React + Vite, hosting a deployment přes Firebase Hosting (firebase deploy), data ve Firestore.
+
+Mazání a správa:
+- Uživatelé mohou upravovat a mazat studenty a předměty.
+- Uživatelé mohou mazat úkoly a komentáře.
+- Odebrání uživatele od studenta nebylo vybráno (zatím mimo rozsah; scénář 3 jen přidání).
