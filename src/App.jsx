@@ -2,6 +2,7 @@ import { AuthProvider, useAuth } from './lib/auth.jsx';
 import { useRoute } from './lib/route.js';
 import { isConfigured } from './firebase.js';
 import Login from './components/Login.jsx';
+import Users from './components/Users.jsx';
 
 function Shell() {
   const { status, user, logout } = useAuth();
@@ -25,7 +26,8 @@ function Shell() {
         <button onClick={logout}>Odhlásit</button>
       </header>
       <main>
-        <p>Trasa: {route.name}</p>
+        {route.name === 'users' && <Users />}
+        {route.name !== 'users' && <p>Trasa: {route.name}</p>}
       </main>
     </>
   );
