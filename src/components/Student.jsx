@@ -4,6 +4,7 @@ import { db } from '../firebase.js';
 import { useDocument, useQuery } from '../lib/data.js';
 import { deleteStudentDeep } from '../lib/students.js';
 import Subjects from './Subjects.jsx';
+import Board from './Board.jsx';
 
 function Members({ student }) {
   const { docs: users } = useQuery(() => query(collection(db, 'allowedUsers'), orderBy('email')), []);
@@ -111,6 +112,7 @@ export default function Student({ studentId }) {
           </>
         )}
       </div>
+      <Board studentId={studentId} subjects={subjects} />
       <Members student={student} />
       <Subjects studentId={studentId} subjects={subjects} />
     </>
