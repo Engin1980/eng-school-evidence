@@ -7,6 +7,7 @@ import { createLogger } from '../lib/log.js';
 import { deleteStudentDeep } from '../lib/students.js';
 import Subjects from './Subjects.jsx';
 import Board from './Board.jsx';
+import Schedule from './Schedule.jsx';
 
 const log = createLogger('student');
 
@@ -131,9 +132,10 @@ export default function Student({ studentId }) {
           </>
         )}
       </div>
-      <Board studentId={studentId} subjects={subjects} />
+      <Board studentId={studentId} subjects={subjects} schedule={student.schedule} />
       <Members student={student} />
       <Subjects studentId={studentId} subjects={subjects} />
+      <Schedule student={student} subjects={subjects} />
     </>
   );
 }

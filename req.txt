@@ -45,3 +45,5 @@ Rozhodnutí při implementaci:
 - Uživatele nelze z aplikace odebrat ze seznamu povolených (jen přidat).
 - Odebrání uživatele od studenta zatím není implementováno.
 - Implementace nebyla ověřena proti živému Firebase projektu (pravidla, přihlášení, dotazy).
+
+- Rozvrh studenta: pro každý den po–pá se vybere, které předměty v ten den má (pole `schedule` u studenta). Při vytváření (ne editaci) úkolu se po výběru předmětu předvyplní termín na nejbližší další den (dnešek se nepočítá), kdy předmět v rozvrhu je; není-li v rozvrhu, termín se nemění.

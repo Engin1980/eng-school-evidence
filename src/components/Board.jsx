@@ -1,15 +1,54 @@
 import { useState } from 'react';
-import { collection, doc, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, limit, orderBy, query, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
-import { useQuery } from '../lib/data.js';
-import { STATUSES, formatDate, groupByStatus, isDueTomorrow, isDueOrOverdue } from '../lib/tasks.js';
+import { useQuery, useUserNames } from '../lib/data.js';
+import { STATUSES, formatDate, formatTimestamp, groupByStatus, isDueTomorrow, isDueOrOverdue } from '../lib/tasks.js';
 import TaskModal from './TaskModal.jsx';
 
-export default function Board({ studentId, subjects }) {
+// Karta úkolu: klik kamkoliv otevře detail; zobrazuje poslední poznámku (živý odběr jedné poznámky).
+function TaskCard({ studentId, task, subjectName, userName, onOpen }) {
+  const { docs } = useQuery(
+    () =>
+      query(
+        collection(db, 'students', studentId, 'tasks', task.id, 'comments'),
+        orderBy('createdAt', 'desc'),
+        limit(1),
+      ),
+    [studentId, task.id],
+  );
+  const last = docs[0];
+  const urgency = isDueOrOverdue(task) ? ' urgent' : isDueTomorrow(task) ? ' tomorrow' : '';
+
+  return (
+    <div
+      className={'task' + urgency}
+      draggable
+      onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
+      onClick={onOpen}
+    >
+      <div className="title">{task.description}</div>
+      <div>
+        <span className="tag">{subjectName}</span>
+        <span className="due">do {formatDate(task.dueDate)}</span>
+      </div>
+      {last && (
+        <div className="last-comment">
+          <div className="muted">
+            {userName(last.author)} · {formatTimestamp(last.createdAt)}
+          </div>
+          {last.text}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Board({ studentId, subjects, schedule }) {
   const { docs: tasks, loading, error } = useQuery(
     () => query(collection(db, 'students', studentId, 'tasks'), orderBy('createdAt', 'desc')),
     [studentId],
   );
+  const userName = useUserNames();
   const [modal, setModal] = useState(null); // { task } | null
   const [overColumn, setOverColumn] = useState('');
   const [moveError, setMoveError] = useState('');
@@ -32,12 +71,6 @@ export default function Board({ studentId, subjects }) {
     const taskId = e.dataTransfer.getData('text/plain');
     const task = tasks.find((t) => t.id === taskId);
     if (task && task.status !== status) move(taskId, status);
-  };
-
-  const shift = (task, delta) => {
-    const i = STATUSES.findIndex((s) => s.id === task.status);
-    const next = STATUSES[i + delta];
-    if (next) move(task.id, next.id);
   };
 
   return (
@@ -73,37 +106,19 @@ export default function Board({ studentId, subjects }) {
               {col.label} ({groups[col.id].length})
             </h3>
             {groups[col.id].map((t) => (
-              <div
+              <TaskCard
                 key={t.id}
-                className={'task' + (isDueOrOverdue(t) ? ' urgent' : isDueTomorrow(t) ? ' tomorrow' : '')}
-                draggable
-                onDragStart={(e) => e.dataTransfer.setData('text/plain', t.id)}
-              >
-                <div className="title" onClick={() => setModal({ task: t })}>
-                  {t.description}
-                </div>
-                <div>
-                  <span className="tag">{subjectName(t.subjectId)}</span>
-                  <span className="due">do {formatDate(t.dueDate)}</span>
-                </div>
-                <div className="row">
-                  <button disabled={t.status === STATUSES[0].id} onClick={() => shift(t, -1)} aria-label="Posunout zpět">
-                    ◀
-                  </button>
-                  <button
-                    disabled={t.status === STATUSES[STATUSES.length - 1].id}
-                    onClick={() => shift(t, 1)}
-                    aria-label="Posunout dál"
-                  >
-                    ▶
-                  </button>
-                </div>
-              </div>
+                studentId={studentId}
+                task={t}
+                subjectName={subjectName(t.subjectId)}
+                userName={userName}
+                onOpen={() => setModal({ task: t })}
+              />
             ))}
           </div>
         ))}
       </div>
-      {modal && <TaskModal studentId={studentId} task={modal.task} subjects={subjects} onClose={() => setModal(null)} />}
+      {modal && <TaskModal studentId={studentId} task={modal.task} subjects={subjects} schedule={schedule} onClose={() => setModal(null)} />}
     </div>
   );
 }

@@ -2,17 +2,18 @@ import { useEffect, useState } from 'react';
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
 import { useAuth } from '../lib/auth.jsx';
+import { nextLessonDate } from '../lib/schedule.js';
 import { STATUSES, formatTimestamp, todayString } from '../lib/tasks.js';
 import { deleteTaskDeep } from '../lib/students.js';
 import Comments from './Comments.jsx';
 
 // task === null -> nový úkol
-export default function TaskModal({ studentId, task, subjects, onClose }) {
+export default function TaskModal({ studentId, task, subjects, schedule, onClose }) {
   const { user } = useAuth();
   const [form, setForm] = useState({
     description: task?.description ?? '',
     subjectId: task?.subjectId ?? subjects[0]?.id ?? '',
-    dueDate: task?.dueDate ?? todayString(),
+    dueDate: task?.dueDate ?? nextLessonDate(schedule, subjects[0]?.id) ?? todayString(),
     status: task?.status ?? 'created',
   });
   const [busy, setBusy] = useState(false);
@@ -24,6 +25,14 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
   }, [onClose]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  // Jen u nového úkolu: termín = nejbližší další den, kdy předmět je v rozvrhu (jinak se nechá beze změny).
+  const pickSubject = (subjectId) =>
+    setForm((f) => ({
+      ...f,
+      subjectId,
+      dueDate: task ? f.dueDate : (nextLessonDate(schedule, subjectId) ?? f.dueDate),
+    }));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -75,7 +84,7 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
                   role="radio"
                   aria-checked={form.subjectId === s.id}
                   className={'subject-card' + (form.subjectId === s.id ? ' selected' : '')}
-                  onClick={() => setForm((f) => ({ ...f, subjectId: s.id }))}
+                  onClick={() => pickSubject(s.id)}
                 >
                   {s.name}
                 </button>

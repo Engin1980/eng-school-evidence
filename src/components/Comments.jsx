@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase.js';
 import { useAuth } from '../lib/auth.jsx';
-import { useQuery } from '../lib/data.js';
+import { useQuery, useUserNames } from '../lib/data.js';
 import { formatTimestamp } from '../lib/tasks.js';
 
 export default function Comments({ studentId, taskId }) {
   const { user } = useAuth();
   const col = collection(db, 'students', studentId, 'tasks', taskId, 'comments');
   const { docs, loading, error } = useQuery(() => query(col, orderBy('createdAt')), [studentId, taskId]);
+  const userName = useUserNames();
   const [text, setText] = useState('');
   const [formError, setFormError] = useState('');
 
@@ -35,7 +36,7 @@ export default function Comments({ studentId, taskId }) {
       {docs.map((c) => (
         <div className="comment" key={c.id}>
           <div className="muted">
-            {c.author} · {formatTimestamp(c.createdAt)}{' '}
+            {userName(c.author)} · {formatTimestamp(c.createdAt)}{' '}
             <button type="button" className="danger" onClick={() => remove(c)}>
               Smazat
             </button>
@@ -45,7 +46,18 @@ export default function Comments({ studentId, taskId }) {
       ))}
       {!loading && docs.length === 0 && <p className="muted">Zatím bez poznámek.</p>}
       <form className="form-grid" onSubmit={add}>
-        <textarea required placeholder="Napsat poznámku…" value={text} onChange={(e) => setText(e.target.value)} />
+        <textarea
+          required
+          placeholder="Napsat poznámku… (Ctrl+Enter odešle)"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              e.currentTarget.form.requestSubmit();
+            }
+          }}
+        />
         <div className="row">
           <button className="primary">Přidat poznámku</button>
           {formError && <span className="error">{formError}</span>}

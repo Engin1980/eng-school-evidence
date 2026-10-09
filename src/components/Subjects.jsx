@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, arrayRemove, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import { WEEKDAYS } from '../lib/schedule.js';
 import { deleteTaskDeep } from '../lib/students.js';
 
 export default function Subjects({ studentId, subjects }) {
@@ -37,6 +38,11 @@ export default function Subjects({ studentId, subjects }) {
           query(collection(db, 'students', studentId, 'tasks'), where('subjectId', '==', s.id)),
         );
         for (const t of tasks.docs) await deleteTaskDeep(studentId, t.id);
+        // Předmět zmizí i z rozvrhu studenta.
+        await updateDoc(
+          doc(db, 'students', studentId),
+          Object.fromEntries(WEEKDAYS.map((d) => [`schedule.${d.id}`, arrayRemove(s.id)])),
+        );
         await deleteDoc(doc(col, s.id));
       });
     }

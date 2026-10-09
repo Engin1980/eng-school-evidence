@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase.js';
 
 // Živý odběr kolekce/dotazu. `makeQuery` vrací Firestore query (nebo null, pokud ještě nelze číst).
 // `deps` určuje, kdy se odběr znovu založí.
@@ -32,4 +33,11 @@ export function useDocument(makeRef, deps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
   return state;
+}
+
+// Funkce e-mail -> jméno uživatele z allowedUsers (bez jména nebo neznámý uživatel = e-mail).
+export function useUserNames() {
+  const { docs } = useQuery(() => collection(db, 'allowedUsers'), []);
+  const names = Object.fromEntries(docs.map((u) => [u.id, u.name]));
+  return (email) => names[email] || email;
 }
