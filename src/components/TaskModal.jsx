@@ -4,6 +4,7 @@ import { db } from '../firebase.js';
 import { useAuth } from '../lib/auth.jsx';
 import { STATUSES, formatTimestamp } from '../lib/tasks.js';
 import { deleteTaskDeep } from '../lib/students.js';
+import Comments from './Comments.jsx';
 
 // task === null -> nový úkol
 export default function TaskModal({ studentId, task, subjects, onClose }) {
@@ -108,6 +109,7 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
             )}
           </div>
         </form>
+        {task && <Comments studentId={studentId} taskId={task.id} />}
       </div>
     </div>
   );
