@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { sendLink, useAuth } from '../lib/auth.jsx';
+import { sendLink, signInWithGoogle, useAuth } from '../lib/auth.jsx';
 
 export default function Login() {
   const { status, error, confirmEmail, logout } = useAuth();
@@ -35,6 +35,21 @@ export default function Login() {
     }
   };
 
+  const google = async () => {
+    setBusy(true);
+    setLocalError('');
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      // Closing the popup is not an error worth showing.
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        setLocalError('Přihlášení přes Google se nezdařilo: ' + (err.code || err.message));
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="card narrow">
       <h1>Evidence úkolů</h1>
@@ -54,6 +69,14 @@ export default function Login() {
             {status === 'needsEmail' ? 'Dokončit přihlášení' : 'Poslat odkaz'}
           </button>
         </form>
+      )}
+      {status !== 'needsEmail' && !sent && (
+        <>
+          <p className="muted">nebo</p>
+          <button onClick={google} disabled={busy}>
+            Přihlásit se přes Google
+          </button>
+        </>
       )}
       {(error || localError) && <p className="error">{error || localError}</p>}
     </div>

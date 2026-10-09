@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { collection, doc, orderBy, query, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
 import { useQuery } from '../lib/data.js';
-import { STATUSES, formatDate, groupByStatus, isOverdue } from '../lib/tasks.js';
+import { STATUSES, formatDate, groupByStatus, isDueTomorrow, isDueOrOverdue } from '../lib/tasks.js';
 import TaskModal from './TaskModal.jsx';
 
 export default function Board({ studentId, subjects }) {
@@ -75,7 +75,7 @@ export default function Board({ studentId, subjects }) {
             {groups[col.id].map((t) => (
               <div
                 key={t.id}
-                className={'task' + (isOverdue(t) ? ' overdue' : '')}
+                className={'task' + (isDueOrOverdue(t) ? ' urgent' : isDueTomorrow(t) ? ' tomorrow' : '')}
                 draggable
                 onDragStart={(e) => e.dataTransfer.setData('text/plain', t.id)}
               >

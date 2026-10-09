@@ -19,9 +19,19 @@ export function groupByStatus(tasks) {
 export const todayString = (now = new Date()) =>
   `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-// Po termínu = není dokončený a termín je před dneškem.
-export const isOverdue = (task, today = todayString()) =>
-  task.status !== 'done' && Boolean(task.dueDate) && task.dueDate < today;
+export const tomorrowString = (now = new Date()) => {
+  const d = new Date(now);
+  d.setDate(d.getDate() + 1);
+  return todayString(d);
+};
+
+// Termín je zítra a úkol není dokončený.
+export const isDueTomorrow = (task, tomorrow = tomorrowString()) =>
+  task.status !== 'done' && Boolean(task.dueDate) && task.dueDate === tomorrow;
+
+// Po termínu nebo dnes = není dokončený a termín je dnes nebo dříve.
+export const isDueOrOverdue = (task, today = todayString()) =>
+  task.status !== 'done' && Boolean(task.dueDate) && task.dueDate <= today;
 
 export function formatDate(dueDate) {
   if (!dueDate) return '';

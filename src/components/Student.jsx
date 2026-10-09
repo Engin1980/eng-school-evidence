@@ -1,31 +1,51 @@
 import { useState } from 'react';
-import { arrayUnion, collection, doc, orderBy, query, updateDoc } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, orderBy, query, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import { normalizeEmail } from '../lib/auth.jsx';
 import { useDocument, useQuery } from '../lib/data.js';
+import { createLogger } from '../lib/log.js';
 import { deleteStudentDeep } from '../lib/students.js';
 import Subjects from './Subjects.jsx';
 import Board from './Board.jsx';
 
+const log = createLogger('student');
+
 function Members({ student }) {
   const { docs: users } = useQuery(() => query(collection(db, 'allowedUsers'), orderBy('email')), []);
-  const [selected, setSelected] = useState('');
+  const [email, setEmail] = useState('');
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const candidates = users.filter((u) => !student.memberEmails.includes(u.id));
-  const label = (email) => {
-    const u = users.find((x) => x.id === email);
-    return u && u.name ? `${u.name} (${email})` : email;
+  const label = (memberEmail) => {
+    const u = users.find((x) => x.id === memberEmail);
+    return u && u.name ? `${u.name} (${memberEmail})` : memberEmail;
   };
 
   const add = async (e) => {
     e.preventDefault();
-    if (!selected) return;
+    const target = normalizeEmail(email);
+    if (!target) return;
     setError('');
+    if (student.memberEmails.includes(target)) {
+      setError('Tento uživatel už je ke studentovi připojen.');
+      return;
+    }
+    setBusy(true);
     try {
-      await updateDoc(doc(db, 'students', student.id), { memberEmails: arrayUnion(selected) });
-      setSelected('');
+      const snap = await getDoc(doc(db, 'allowedUsers', target));
+      if (!snap.exists()) {
+        log.warn('Add member: no such allowed user', target);
+        setError('Uživatel s tímto e-mailem neexistuje. Nejdříve ho přidejte na stránce Uživatelé.');
+        return;
+      }
+      await updateDoc(doc(db, 'students', student.id), { memberEmails: arrayUnion(target) });
+      log.info('Member added to student', { studentId: student.id, email: target });
+      setEmail('');
     } catch (err) {
+      log.error('Add member failed', err.code, err.message, err);
       setError('Uložení se nezdařilo: ' + (err.code || err.message));
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -33,20 +53,19 @@ function Members({ student }) {
     <div className="card">
       <h2>Uživatelé studenta</h2>
       <ul className="list">
-        {student.memberEmails.map((email) => (
-          <li key={email}>{label(email)}</li>
+        {student.memberEmails.map((memberEmail) => (
+          <li key={memberEmail}>{label(memberEmail)}</li>
         ))}
       </ul>
       <form className="row" onSubmit={add}>
-        <select value={selected} onChange={(e) => setSelected(e.target.value)}>
-          <option value="">— vyberte uživatele —</option>
-          {candidates.map((u) => (
-            <option key={u.id} value={u.id}>
-              {label(u.id)}
-            </option>
-          ))}
-        </select>
-        <button className="primary" disabled={!selected}>
+        <input
+          type="email"
+          required
+          placeholder="e-mail uživatele"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button className="primary" disabled={busy}>
           Připojit ke studentovi
         </button>
         {error && <span className="error">{error}</span>}

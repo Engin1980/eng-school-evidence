@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
 import { useAuth } from '../lib/auth.jsx';
@@ -17,6 +17,12 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const submit = async (e) => {
@@ -54,17 +60,29 @@ export default function TaskModal({ studentId, task, subjects, onClose }) {
       <div className="modal">
         <h2>{task ? 'Úkol' : 'Nový úkol'}</h2>
         <form className="form-grid" onSubmit={submit}>
-          <label>
+          <div>
             Předmět
-            <select required value={form.subjectId} onChange={set('subjectId')}>
-              {subjectMissing && <option value={task.subjectId}>(smazaný předmět)</option>}
+            <div className="subject-cards" role="radiogroup" aria-label="Předmět">
+              {subjectMissing && (
+                <button type="button" role="radio" aria-checked className="subject-card selected">
+                  (smazaný předmět)
+                </button>
+              )}
               {subjects.map((s) => (
-                <option key={s.id} value={s.id}>
+                <button
+                  key={s.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={form.subjectId === s.id}
+                  className={'subject-card' + (form.subjectId === s.id ? ' selected' : '')}
+                  onClick={() => setForm((f) => ({ ...f, subjectId: s.id }))}
+                >
                   {s.name}
-                </option>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+            {subjects.length === 0 && <span className="muted">Nejdříve přidejte předmět.</span>}
+          </div>
           <label>
             Termín splnění
             <input type="date" required value={form.dueDate} onChange={set('dueDate')} />

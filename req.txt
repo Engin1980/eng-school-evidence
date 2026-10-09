@@ -18,6 +18,7 @@ POZNÁMKY / ROZHODNUTÍ (doplněno při upřesňování)
 
 Přihlášení:
 - Firebase Authentication, přihlášení e-mailovým odkazem (passwordless), funguje s libovolným e-mailem, ne jen Google.
+- Kromě odkazu je možné přihlášení přes Google (popup, Firebase Authentication); stejný allow-list e-mailů platí pro obě metody.
 - Přihlášení se drží v prohlížeči dlouhodobě (localStorage), dokud se uživatel neodhlásí nebo nesmaže data prohlížeče. Odkaz je potřeba jen při prvním přihlášení na daném zařízení.
 - Odkaz je nejlepší otevřít ve stejném prohlížeči, kde se o něj žádalo; jinak aplikace znovu zeptá na e-mail.
 - Zakládání uživatelů (scénář 1): existující uživatel zadá e-mail nového uživatele, uloží se do Firestore jako povolený; pravidla databáze pustí jen e-maily z tohoto seznamu. Nový uživatel si pak sám vyžádá odkaz.

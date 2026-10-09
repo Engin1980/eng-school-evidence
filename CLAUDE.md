@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Frontend-only SPA: React + Vite. No custom backend.
 - Data in Firestore. Hosting and deployment via Firebase Hosting (`firebase deploy`).
-- Auth: Firebase Authentication, passwordless email-link sign-in (any email address, not only Google). Persistence is the Firebase default (`localStorage`), so users stay signed in on a device.
+- Auth: Firebase Authentication, passwordless email-link sign-in (any email address) plus Google sign-in (popup). Both go through the same allow-list. Persistence is the Firebase default (`localStorage`), so users stay signed in on a device.
 - Security is intentionally trivial (data is not sensitive). Firestore rules only require that the signed-in email is on the allow-list and, for student data, a member of the student.
 
 ## Domain model

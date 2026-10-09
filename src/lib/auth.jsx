@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
+  GoogleAuthProvider,
   isSignInWithEmailLink,
   onAuthStateChanged,
   sendSignInLinkToEmail,
   signInWithEmailLink,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -33,6 +35,19 @@ export async function sendLink(email) {
   }
   localStorage.setItem(EMAIL_KEY, target);
   log.info('Firebase accepted the request; the email should be on its way (check spam). Email stored for completing sign-in.');
+}
+
+export async function signInWithGoogle() {
+  log.info('Starting Google sign-in (popup)');
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  try {
+    const result = await signInWithPopup(auth, provider);
+    log.info('Google sign-in succeeded', { email: result.user.email, uid: result.user.uid });
+  } catch (err) {
+    log.error('Google sign-in failed', err.code, err.message, err);
+    throw err;
+  }
 }
 
 // status: loading | signedOut | needsEmail | denied | ready
