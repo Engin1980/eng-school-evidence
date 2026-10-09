@@ -3,6 +3,7 @@ import { arrayUnion, collection, doc, orderBy, query, updateDoc } from 'firebase
 import { db } from '../firebase.js';
 import { useDocument, useQuery } from '../lib/data.js';
 import { deleteStudentDeep } from '../lib/students.js';
+import Subjects from './Subjects.jsx';
 
 function Members({ student }) {
   const { docs: users } = useQuery(() => query(collection(db, 'allowedUsers'), orderBy('email')), []);
@@ -57,6 +58,10 @@ export default function Student({ studentId }) {
   const { data: student, error } = useDocument(() => doc(db, 'students', studentId), [studentId]);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
+  const { docs: subjects } = useQuery(
+    () => query(collection(db, 'students', studentId, 'subjects'), orderBy('name')),
+    [studentId],
+  );
 
   if (error) return <p className="error">Student nelze načíst: {error}</p>;
   if (student === undefined) return <p>Načítám…</p>;
@@ -107,6 +112,7 @@ export default function Student({ studentId }) {
         )}
       </div>
       <Members student={student} />
+      <Subjects studentId={studentId} subjects={subjects} />
     </>
   );
 }
