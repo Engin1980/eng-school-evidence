@@ -31,6 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `src/firebase.js`: init from `VITE_FIREBASE_*` env vars (see `.env.example`). The app shows a setup message when they are missing.
 - `src/lib/auth.jsx`: `AuthProvider`/`useAuth`. Status is `loading | signedOut | needsEmail | denied | ready`. `denied` means signed in but not on the allow-list.
+- `src/lib/log.js`: universal logger, `createLogger('namespace')` with `debug/info/warn/error`. Level from `localStorage.logLevel` or `VITE_LOG_LEVEL` (default `debug`). Use it instead of bare `console.*`.
 - `src/lib/data.js`: `useQuery`/`useDocument` live-subscription hooks. `src/lib/students.js`: manual deep deletes, since Firestore does not delete subcollections. `src/lib/tasks.js`: statuses and pure helpers.
 - `src/lib/route.js`: tiny hash router (`#/`, `#/users`, `#/student/<id>`). There is no router dependency.
 - `src/components/`: one component per screen or panel. `Student.jsx` composes `Board` (kanban, native drag and drop), `Members` and `Subjects`. `TaskModal` embeds `Comments`.
