@@ -3,6 +3,8 @@ import { useRoute } from './lib/route.js';
 import { isConfigured } from './firebase.js';
 import Login from './components/Login.jsx';
 import Users from './components/Users.jsx';
+import Students from './components/Students.jsx';
+import Student from './components/Student.jsx';
 
 function Shell() {
   const { status, user, logout } = useAuth();
@@ -27,7 +29,8 @@ function Shell() {
       </header>
       <main>
         {route.name === 'users' && <Users />}
-        {route.name !== 'users' && <p>Trasa: {route.name}</p>}
+        {route.name === 'students' && <Students />}
+        {route.name === 'student' && <Student key={route.studentId} studentId={route.studentId} />}
       </main>
     </>
   );
