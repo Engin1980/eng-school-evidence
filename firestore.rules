@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Záměrně jednoduchá pravidla: data nejsou citlivá.
+// Přístup mají jen e-maily z allowedUsers; data studenta jen jeho členové.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function email() {
+      return request.auth.token.email.lower();
+    }
+
+    function allowed() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/allowedUsers/$(email()));
+    }
+
+    function isMember(studentId) {
+      return allowed()
+        && email() in get(/databases/$(database)/documents/students/$(studentId)).data.memberEmails;
+    }
+
+    match /allowedUsers/{userEmail} {
+      allow read, create, update, delete: if allowed();
+    }
+
+    match /students/{studentId} {
+      allow read, update, delete: if allowed() && email() in resource.data.memberEmails;
+      allow create: if allowed() && email() in request.resource.data.memberEmails;
+
+      match /{document=**} {
+        allow read, write: if isMember(studentId);
+      }
+    }
+  }
+}
