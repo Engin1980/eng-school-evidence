@@ -51,3 +51,6 @@ main { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
 .schedule-day .subject-card { padding: 6px 10px; text-align: left; }
 
 .task .last-comment { margin-top: 6px; padding-top: 6px; border-top: 1px solid #e3e6ee; font-size: .9em; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 5.4em; overflow: hidden; }
+
+.subject-cards.filter { margin-bottom: 10px; }
+.subject-cards.filter .subject-card { padding: 4px 12px; border-width: 1px; }

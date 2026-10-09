@@ -50,10 +50,15 @@ export default function Board({ studentId, subjects, schedule }) {
   );
   const userName = useUserNames();
   const [modal, setModal] = useState(null); // { task } | null
+  const [filter, setFilter] = useState([]); // vybrané předměty; prázdné = vše
   const [overColumn, setOverColumn] = useState('');
   const [moveError, setMoveError] = useState('');
 
-  const groups = groupByStatus(tasks);
+  // Smazané předměty ve filtru se ignorují; zbyde-li prázdný výběr, zobrazí se vše.
+  const activeFilter = filter.filter((id) => subjects.some((s) => s.id === id));
+  const visible = activeFilter.length ? tasks.filter((t) => activeFilter.includes(t.subjectId)) : tasks;
+  const groups = groupByStatus(visible);
+  const toggleFilter = (id) => setFilter((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
   const subjectName = (id) => subjects.find((s) => s.id === id)?.name ?? '(smazaný předmět)';
 
   const move = async (taskId, status) => {
@@ -87,6 +92,26 @@ export default function Board({ studentId, subjects, schedule }) {
           Nový úkol
         </button>
       </div>
+      {subjects.length > 0 && (
+        <div className="subject-cards filter" role="group" aria-label="Filtr předmětů">
+          {subjects.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              aria-pressed={activeFilter.includes(s.id)}
+              className={'subject-card' + (activeFilter.includes(s.id) ? ' selected' : '')}
+              onClick={() => toggleFilter(s.id)}
+            >
+              {s.name}
+            </button>
+          ))}
+          {activeFilter.length > 0 && (
+            <button type="button" onClick={() => setFilter([])}>
+              Zrušit filtr
+            </button>
+          )}
+        </div>
+      )}
       {loading && <p>Načítám…</p>}
       {error && <p className="error">Chyba: {error}</p>}
       {moveError && <p className="error">{moveError}</p>}
