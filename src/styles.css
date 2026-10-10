@@ -30,6 +30,7 @@ main { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
 .task { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.12); cursor: pointer; }
 .task.urgent { background: #fde3e1; }
 .task.tomorrow { background: #fff6c2; }
+.task .due { font-size: .80em; display:inline-block; margin-top:8px; margin-bottom:4px; }
 .task.urgent .due { color: #b3261e; font-weight: 600; }
 .task .title { font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 4.5em; overflow: hidden; }
 .tag { display: inline-block; font-size: .8em; background: #dde4f6; border-radius: 4px; padding: 1px 6px; margin-right: 4px; }
