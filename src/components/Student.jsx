@@ -105,9 +105,6 @@ export default function Student({ studentId }) {
 
   return (
     <>
-      <p>
-        <a href="#/">← Studenti</a>
-      </p>
       <div className="row">
         {editing ? (
           <form className="row" onSubmit={rename}>
