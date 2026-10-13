@@ -21,7 +21,7 @@ function TaskCard({ studentId, task, subjectName, userName, onOpen }) {
 
   return (
     <div
-      className={'task' + urgency}
+      className={'task' + urgency + (task.important ? ' important' : '')}
       draggable
       onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
       onClick={onOpen}

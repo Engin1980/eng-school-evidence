@@ -4,6 +4,7 @@ import { db } from '../firebase.js';
 import { normalizeEmail } from '../lib/auth.jsx';
 import { useDocument, useQuery } from '../lib/data.js';
 import { createLogger } from '../lib/log.js';
+import { sortByName } from '../lib/sort.js';
 import { deleteStudentDeep } from '../lib/students.js';
 import Subjects from './Subjects.jsx';
 import Board from './Board.jsx';
@@ -79,10 +80,11 @@ export default function Student({ studentId }) {
   const { data: student, error } = useDocument(() => doc(db, 'students', studentId), [studentId]);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
-  const { docs: subjects } = useQuery(
-    () => query(collection(db, 'students', studentId, 'subjects'), orderBy('name')),
+  const { docs: subjectDocs } = useQuery(
+    () => query(collection(db, 'students', studentId, 'subjects')),
     [studentId],
   );
+  const subjects = sortByName(subjectDocs);
 
   if (error) return <p className="error">Student nelze načíst: {error}</p>;
   if (student === undefined) return <p>Načítám…</p>;
